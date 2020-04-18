@@ -1,0 +1,20 @@
+.node {
+    width: 25px;
+    height: 25px;
+    margin: 0 0 0 -1px;
+    outline: 1px solid darkgrey;
+    outline-offset: -1px;
+    display: inline-block;
+}
+
+.node-start {
+    background-color: greenyellow;
+}
+
+.node-finish {
+    background-color: tomato;
+}
+
+.node-visited {
+    background-color: cornflowerblue;
+}
