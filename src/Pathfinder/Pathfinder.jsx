@@ -10,6 +10,7 @@ const FINISH_NODE_COL = 35;
 
 const Pathfinder = () => {
     const [grid, setGrid] = useState([]);
+    const [mouseIsPressed, setMouseIsPressed] = useState(false);
     useEffect(() => {
         initaliseGrid();
     }, []);
@@ -38,19 +39,14 @@ const Pathfinder = () => {
         };
     };
 
-    const animateDijkstra = (visitedNodesInOrder) => {
+    const animateDijkstra = async (visitedNodesInOrder) => {
         for (let i = 0; i < visitedNodesInOrder.length; i++) {
             setTimeout(() => {
                 const node = visitedNodesInOrder[i];
-                // console.log(node);
-                const newGrid = grid.slice();
-                const newNode = {
-                    ...node,
-                    isVisited: true,
-                };
-                newGrid[node.row][node.col] = newNode;
-                setGrid(newGrid);
-            }, 50 * i);
+                document.getElementById(
+                    `node-${node.row}-${node.col}`
+                ).className += " node-visited";
+            }, 10 * i);
         }
     };
 
@@ -60,6 +56,37 @@ const Pathfinder = () => {
         const visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
         console.log(visitedNodesInOrder);
         animateDijkstra(visitedNodesInOrder);
+    };
+
+    const handleMouseDown = (row, col) => {
+        setMouseIsPressed(true);
+
+        if (!mouseIsPressed) return;
+        console.log("Mouse is Pressed");
+        const newGrid = getNewGridWithWallToggled(grid, row, col);
+        setGrid(newGrid);
+    };
+
+    const handleMouseEnter = (row, col) => {
+        if (!mouseIsPressed) return;
+        const newGrid = getNewGridWithWallToggled(grid, row, col);
+        setGrid(newGrid);
+    };
+
+    const handleMouseUp = () => {
+        console.log("Mouse is Released");
+        setMouseIsPressed(false);
+    };
+
+    const getNewGridWithWallToggled = (grid, row, col) => {
+        const newGrid = grid.slice();
+        const node = newGrid[row][col];
+        const newNode = {
+            ...node,
+            isWall: !node.isWall,
+        };
+        newGrid[row][col] = newNode;
+        return newGrid;
     };
 
     return (
@@ -75,13 +102,30 @@ const Pathfinder = () => {
                     return (
                         <div className='nodeRow' key={rowIndex}>
                             {row.map((node, nodeIndex) => {
-                                const { isStart, isFinish, isVisited } = node;
+                                const {
+                                    row,
+                                    col,
+                                    isStart,
+                                    isFinish,
+                                    isVisited,
+                                    isWall,
+                                } = node;
                                 return (
                                     <Node
                                         key={nodeIndex}
+                                        row={row}
+                                        col={col}
                                         isStart={isStart}
                                         isFinish={isFinish}
                                         isVisited={isVisited}
+                                        isWall={isWall}
+                                        onMouseDown={(row, col) =>
+                                            handleMouseDown(row, col)
+                                        }
+                                        onMouseEnter={(row, col) =>
+                                            handleMouseEnter(row, col)
+                                        }
+                                        onMouseUp={() => handleMouseUp()}
                                     />
                                 );
                             })}
